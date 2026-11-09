@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>告別之旅</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="告別之旅">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#FAF8F3">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#141311">
+<meta name="description" content="2026 年 12 月日本告別之旅的隨身行程（私人）">
+<meta name="robots" content="noindex, nofollow">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="stamps-inputs.css">
+<link rel="stylesheet" href="stamps-art.css">
+<link rel="stylesheet" href="stamps.css">
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div class="topbar-text">
+      <div class="topbar-title">告別之旅</div>
+      <div class="topbar-sub"></div>
+    </div>
+    <button class="icon-btn" type="button" hidden aria-label=""></button>
+  </header>
+  <main id="view" aria-live="off"></main>
+  <nav class="tabbar" role="tablist" aria-label="分頁">
+    <button class="tab" type="button" role="tab" data-tab="now" aria-selected="true"></button>
+    <button class="tab" type="button" role="tab" data-tab="days" aria-selected="false"></button>
+    <button class="tab" type="button" role="tab" data-tab="places" aria-selected="false"></button>
+    <button class="tab" type="button" role="tab" data-tab="info" aria-selected="false"></button>
+  </nav>
+</div>
+<section id="sheet" role="dialog" aria-modal="true" aria-label="介紹" hidden></section>
+<section id="lock" hidden aria-labelledby="lock-title">
+  <form class="lock-box">
+    <h1 class="lock-title" id="lock-title">輸入行程密碼</h1>
+    <p class="lock-note">只需要輸入一次，之後這支手機會記住。</p>
+    <input id="pass" type="password" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" aria-label="行程密碼">
+    <label class="lock-show"><input type="checkbox" id="pass-show"> 顯示密碼</label>
+    <button class="btn primary" type="submit" id="unlock">解鎖</button>
+    <p class="lock-error" role="alert" hidden></p>
+  </form>
+</section>
+<noscript><p class="empty">這個 App 需要 JavaScript。</p></noscript>
+<script src="stamps-inputs.js"></script>
+<script src="stamps-art.js"></script>
+<script src="stamps.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

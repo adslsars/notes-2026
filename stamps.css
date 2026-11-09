@@ -1,0 +1,218 @@
+/* 告別之旅 App — 集章分頁樣式（stamps.css）
+ * 所有選擇器以 .st- 開頭；例外：nav.tabbar.st-5（5 格分頁）、.tab .st-dot（紅點）。
+ * 卡片、印章、結果卡放在「紙」上（.st-paper），深色模式仍是紙（brightness .9）；題目頁沿用 app.css 的 token。
+ */
+:root {
+  --st-paper: #F4EEE2; --st-paper-edge: #E4DCCB; --st-card-ink: #2A2623; --st-card-ink-3: #6E665C;
+  --st-mincho: "Hiragino Mincho ProN", "Hiragino Mincho Pro", "Yu Mincho", "YuMincho", "BIZ UDMincho", "Noto Serif JP", "Noto Serif TC", "Songti TC", serif;
+  --st-flash: #F3D873;
+}
+
+/* ---------- 分頁、紅點 ---------- */
+nav.tabbar.st-5 { grid-template-columns: repeat(5, 1fr); }
+.tab .st-dot { position: absolute; top: 7px; left: calc(50% + 9px); width: 8px; height: 8px; border-radius: 50%; background: var(--noyk); box-shadow: 0 0 0 2px var(--bar); }
+.st-now-card { border-left: 4px solid var(--accent-fill); }
+.st-now-card > .card-h { padding-right: 30px; }
+.st-now-card > .card-chevron { position: absolute; right: 12px; top: 14px; z-index: 2; }
+.st-now-title { font-size: 1.056rem; font-weight: 800; letter-spacing: -.01em; line-height: 1.35; }
+.st-now-sub { margin-top: 2px; font-size: .889rem; color: var(--ink-3); }
+.st-now-sub.st-new { color: var(--accent); font-weight: 700; }
+
+/* ---------- 遮罩圖（GPT 的圖＋墨色） ---------- */
+/* 寬度用 :where（零特異度）：元件自己定寬的小圖（.st-in-icon、.st-choice-icon、.st-part-icon…）不會被蓋成 100% */
+:where(.st-mask) { width: 100%; }
+.st-mask { display: block; -webkit-mask-size: 100% 100%; mask-size: 100% 100%; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center; }
+.st-mask.st-noimg { background-color: transparent !important; }
+.st-topline { margin: 2px 0 10px; font-size: .833rem; line-height: 1.5; }
+.st-loading { margin: 0 0 8px; padding: 8px 12px; border: 1px dashed var(--line); border-radius: var(--radius); text-align: center; }
+.st-link { border: 0; background: none; padding: 8px 4px; min-height: 44px; color: var(--accent); font-size: .889rem; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; -webkit-tap-highlight-color: var(--tap); }
+.st-rules-link { text-align: center; margin: 10px 0 0; }
+
+/* ---------- 規則卡 ---------- */
+.st-rules { margin-bottom: 12px; }
+.st-rule-lines { margin: 6px 0 0; padding-left: 22px; font-size: .944rem; line-height: 1.6; }
+.st-rule-lines li { margin: 5px 0; }
+.st-rules-ok { margin-top: 10px; }
+
+/* ---------- 紙 ---------- */
+.st-paper { position: relative; background-color: var(--st-paper); color: var(--st-card-ink); box-shadow: 0 0 0 1px var(--st-paper-edge), 0 6px 22px rgba(0, 0, 0, .10); border-radius: var(--radius-lg); overflow: hidden; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .st-paper { filter: brightness(.9); box-shadow: 0 0 0 1px #3a352d; } }
+:root[data-theme="dark"] .st-paper { filter: brightness(.9); box-shadow: 0 0 0 1px #3a352d; }
+
+/* ---------- 卡片（照 art/card/card-preview.html） ---------- */
+.st-card { margin: 0 calc(-1 * var(--gutter) + 4px); padding: 22px 14px 30px; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .45  0 0 0 0 .38  0 0 0 0 .28  0 0 0 .07 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+@media (min-width: 460px) { .st-card { margin: 0 auto; max-width: 430px; } }
+.st-corner { position: absolute; pointer-events: none; opacity: .92; }
+.st-corner.st-tl { top: -6px; left: -8px; width: 92px; }
+.st-corner.st-tr { top: -4px; right: -6px; width: 74px; }
+.st-corner.st-bl { bottom: -6px; left: -8px; width: 96px; }
+.st-corner.st-br { bottom: -6px; right: -6px; width: 84px; }
+.st-card-title { position: relative; text-align: center; margin: 4px 64px 6px; font-family: var(--st-mincho); }
+.st-card-title h2 { margin: 0; font-size: 25px; font-weight: 600; letter-spacing: .32em; text-indent: .32em; line-height: 1.3; }
+.st-card-title p { margin: 4px 0 0; font-size: 12.5px; letter-spacing: .4em; text-indent: .4em; color: var(--st-card-ink-3); }
+.st-header-img { width: calc(100% + 12px); margin: 6px -6px 2px; }
+.st-progress { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 2px 0 14px; font-family: var(--st-mincho); font-size: 14px; color: var(--st-card-ink-3); letter-spacing: .1em; }
+.st-progress b { color: var(--st-card-ink); font-size: 17px; font-weight: 600; }
+.st-snow-sm { width: 16px; flex: none; opacity: .75; }
+.st-snow-md { width: 26px; flex: none; opacity: .85; }
+.st-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 12px; }
+.st-grid .st-slot.st-last { grid-column: 1 / span 2; width: calc(50% - 6px); justify-self: center; }
+.st-slot { position: relative; display: block; width: 100%; border: 0; padding: 0; margin: 0; background: none; font: inherit; color: inherit; text-align: center; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.st-slot .st-stamp { width: 100%; }
+.st-slot .st-empty { position: relative; }
+.st-slot .st-frame { width: 100%; }
+.st-slot .st-inside { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-family: var(--st-mincho); color: var(--st-card-ink-3); pointer-events: none; }
+.st-slot .st-d { font-size: 22px; letter-spacing: .06em; color: var(--st-card-ink); opacity: .55; }
+.st-slot .st-w { font-size: 12px; letter-spacing: .2em; opacity: .7; }
+.st-slot .st-cap { font-family: var(--st-mincho); padding-top: 4px; line-height: 1.35; }
+.st-slot .st-n { display: block; font-size: 13.5px; letter-spacing: .08em; opacity: .55; }
+.st-slot .st-dd { display: block; font-size: 11.5px; letter-spacing: .14em; opacity: .5; }
+.st-slot.open .st-d, .st-slot.late .st-d { opacity: 1; }
+.st-slot .st-go { font-family: var(--font-body); font-size: 12px; font-weight: 700; color: #161412; background: #D8B130; padding: 3px 10px; border-radius: 999px; letter-spacing: .05em; }
+.st-slot .st-go-late { background: #E4DCCB; color: #2A2623; }
+.st-slot.open .st-empty::after { content: ""; position: absolute; inset: 3%; border: 2px solid #D8B130; border-radius: 3px; opacity: 0; animation: st-breathe 2.4s ease-in-out infinite; pointer-events: none; }
+@keyframes st-breathe { 50% { opacity: .55; } }
+.st-slot.missed .st-inside .st-snow { width: 34%; opacity: .55; }
+.st-slot.missed .st-m { font-size: 12px; letter-spacing: .3em; text-indent: .3em; opacity: .7; }
+.st-slot .st-stamp.st-dim { opacity: .25; }
+.st-slot.st-viewed .st-inside .st-snow { opacity: .7; }
+/* 看過答案的格子：字疊在淡墨印章上，加紙色描邊才讀得到 */
+.st-slot.st-viewed .st-m { opacity: .9; color: var(--st-card-ink); paint-order: stroke fill; -webkit-text-stroke: 4px var(--st-paper); text-shadow: 0 0 3px var(--st-paper), 0 0 6px var(--st-paper); }
+.st-slot.st-pressing { z-index: 2; }
+.st-divider { display: flex; align-items: center; justify-content: center; gap: 14px; margin: 26px 0 16px; }
+.st-bonus { display: block; width: 64%; margin: 0 auto; border: 0; padding: 0; background: none; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.st-bonus-lock { cursor: default; margin-bottom: 8px; }
+.st-bonus-lock .st-slot { cursor: default; }
+.st-bonus-lock .st-d.st-q { font-size: 30px; }
+.st-bonus-note { text-align: center; font-family: var(--st-mincho); font-size: 12.5px; color: var(--st-card-ink-3); letter-spacing: .12em; margin: 8px 0 0; white-space: nowrap; }
+.st-open-today { display: flex; width: 100%; margin-top: 16px; }
+
+/* ---------- 任務頁 ---------- */
+.st-sheet { padding-top: 10px; }
+/* 當天的墨色（引擎把淺、深兩色寫在 .st-sheet 的行內變數上）：深色模式用 dark 那一色，答對棋子的字在深底才看得清 */
+.st-sheet { --st-day-ink: var(--st-day-ink-light, var(--accent)); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .st-sheet { --st-day-ink: var(--st-day-ink-dark, var(--st-day-ink-light, var(--accent))); } }
+:root[data-theme="dark"] .st-sheet { --st-day-ink: var(--st-day-ink-dark, var(--st-day-ink-light, var(--accent))); }
+.st-sheet .st-topline { margin-top: 4px; }
+.st-preview-tag { margin: 0 0 8px; padding: 6px 10px; background: var(--warn-soft); color: var(--warn); border-radius: var(--radius); font-size: .833rem; font-weight: 700; }
+.st-title { margin: 14px 0 10px; }
+.st-late-note { margin: -4px 0 10px; }
+.st-stages { display: grid; gap: 18px; }
+.st-stage { padding: 0 0 18px; border-bottom: 1px solid var(--line-soft); }
+.st-stage:last-child { border-bottom: 0; }
+.st-stage-label { font-family: var(--font-mono); font-size: .833rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); margin: 0 0 8px; }
+.st-blocks { font-size: 1rem; line-height: 1.7; }
+.st-p { margin: 0 0 .8em; overflow-wrap: anywhere; }
+.st-p.st-small { font-size: .889rem; color: var(--ink-2); line-height: 1.6; }
+.st-p.st-big { font-size: 1.444rem; font-weight: 700; line-height: 1.5; }
+.st-p.st-center, .st-center { text-align: center; }
+.st-h { font-size: 1rem; font-weight: 800; margin: 1.1em 0 .4em; letter-spacing: -.01em; }
+.st-blocks > .st-h:first-child { margin-top: 0; }
+.st-note { margin: 0 0 .8em; padding: 8px 12px; background: var(--surface-2); border-radius: var(--radius); font-size: .889rem; line-height: 1.6; color: var(--ink-2); }
+.st-note.st-safety { background: var(--warn-soft); color: var(--warn); border-left: 4px solid var(--warn); border-radius: 0 var(--radius) var(--radius) 0; }
+/* 和歌、引文：只在全形空白、<br> 處換行，不在字中間斷（390 寬時「月待てば」的「ば」不會單獨掉到下一行） */
+.st-quote { margin: .6em 0 1em; padding: 10px 12px; font-feature-settings: "palt"; font-family: var(--st-mincho); font-size: 1.111rem; line-height: 1.9; text-align: center; letter-spacing: .04em; word-break: keep-all; overflow-wrap: anywhere; }
+.st-list { margin: 0 0 .8em; padding-left: 22px; }
+.st-list li { margin: .35em 0; line-height: 1.6; }
+.st-pending { margin: 0 0 .8em; padding: 12px 14px; border: 1px dashed var(--line); border-radius: var(--radius); color: var(--ink-3); font-size: .889rem; text-align: center; }
+.st-stage-pending { margin: 0; }
+.st-fold { margin: .2em 0 .9em; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+.st-fold > summary { position: relative; display: flex; align-items: center; min-height: 48px; padding: 4px 40px 4px 14px; font-size: .944rem; font-weight: 700; }
+.st-fold > summary::after { content: ""; position: absolute; right: 10px; top: 50%; width: 20px; height: 20px; margin-top: -10px; background: var(--ink-3); -webkit-mask: var(--m-chevron) center / contain no-repeat; mask: var(--m-chevron) center / contain no-repeat; transition: transform .15s ease; }
+.st-fold[open] > summary::after { transform: rotate(180deg); }
+.st-fold[data-anim="close"] > summary::after { transform: none; }
+.st-fold-body { padding: 2px 14px 10px; border-top: 1px solid var(--line-soft); font-size: .944rem; }
+.st-fold-body .st-h { font-size: .944rem; }
+.st-figure { position: relative; margin: .4em auto 1em; }
+.st-fig-fallback .st-mask { width: 100%; }
+.st-pause { display: block; margin: .4em 0 .8em; }
+.st-after-pause { display: block; }
+
+/* 輸入區、送出列 */
+.st-input { margin-top: 6px; }
+.st-input-label { font-size: .889rem; font-weight: 700; color: var(--ink-2); margin: 0 0 8px; white-space: pre-wrap; }
+.st-input-host { margin-bottom: 10px; }
+/* 只給引擎的備援文字框；元件的輸入框（.st-in-input、看板 .st-board-in）樣式在 stamps-inputs.css，這裡不要再用 input[type="text"] 蓋過去 */
+.st-text { width: 100%; min-height: 48px; padding: 0 14px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); color: var(--ink); font-size: 1rem; -webkit-appearance: none; appearance: none; }
+.st-text:disabled { opacity: .55; background: var(--surface-2); }
+.st-submit-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 10px; }
+.st-submit { flex: 0 0 auto; min-width: 128px; max-width: 100%; }
+.st-submit.st-locked, .st-submit:disabled { opacity: .55; }
+.st-submit-note { font-size: .833rem; }
+.st-reply { margin: 8px 0 0; min-height: 0; font-size: .944rem; line-height: 1.55; color: var(--ink-2); }
+.st-reply.st-has { padding: 8px 12px; background: var(--surface-2); border-left: 3px solid var(--accent-fill); border-radius: 0 var(--radius) var(--radius) 0; }
+.st-locknote, .st-footnote { margin: 8px 0 0; font-size: .833rem; line-height: 1.55; }
+.st-switch-row { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 4px 14px; }
+.st-switch { border: 0; background: none; padding: 8px 0; min-height: 44px; color: var(--accent); font-size: .889rem; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; -webkit-tap-highlight-color: var(--tap); }
+.st-part { margin-bottom: 12px; position: relative; }
+.st-part-head { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.st-part-icon { display: block; width: 56px; flex: none; }
+.st-part-label { font-size: .944rem; font-weight: 700; color: var(--ink-2); }
+.st-part-solved .st-part-host { opacity: .7; }
+.st-part-mark { position: absolute; right: 0; top: 0; font-size: 1.111rem; font-weight: 800; color: var(--accent); }
+.st-fallback { margin: 0 0 6px; }
+
+/* 已答對的段 */
+.st-solved-line { display: flex; align-items: baseline; gap: 8px; margin: 0; font-size: 1rem; }
+.st-check { color: var(--accent); font-weight: 800; }
+.st-solved-answer { font-weight: 700; }
+.st-solved-text { margin-top: 6px; }
+.st-readonly { opacity: .92; }
+
+/* 提示 */
+.st-hints { margin-top: 14px; }
+.st-hint-list { margin: 0 0 8px; padding: 0; list-style: none; counter-reset: st-hint; }
+.st-hint { position: relative; margin: 6px 0; padding: 10px 12px 10px 40px; background: var(--accent-soft); color: var(--ink); border-radius: var(--radius); font-size: .944rem; line-height: 1.6; counter-increment: st-hint; hanging-punctuation: first; }
+.st-hint::before { content: counter(st-hint); position: absolute; left: 12px; top: 10px; font-family: var(--font-mono); font-weight: 800; color: var(--accent); }
+.st-hint-auto { margin: 0 0 8px; }
+.st-hint-btn { min-width: 160px; }
+
+/* ---------- 結果卡、答案頁 ---------- */
+.st-result-paper, .st-missed-paper, .st-bonus-paper { padding: 22px 18% 18px; margin: 8px 0 16px; text-align: center; }
+.st-bonus-paper { padding: 24px 10%; margin-top: 16px; }
+.st-stamp-img { width: 100%; margin: 0 auto; }
+.st-stamp-img.st-dim { opacity: .25; }
+.st-stamp-caption { margin: 12px -14% 0; font-feature-settings: "palt"; font-family: var(--st-mincho); font-size: .833rem; line-height: 1.6; color: var(--st-card-ink-3); }
+.st-snow-over { position: absolute; left: 50%; top: 50%; width: 30%; transform: translate(-50%, -62%); opacity: .8; }
+/* 錯過的字（common.card.missed）疊在淡墨印章上：紙色描邊＋略深的字色，壓到圖案也讀得清楚 */
+.st-missed-word { position: absolute; left: 0; right: 0; top: 62%; margin: 0; font-family: var(--st-mincho); font-size: 15px; font-weight: 600; letter-spacing: .3em; text-indent: .3em; color: var(--st-card-ink); opacity: .85; paint-order: stroke fill; -webkit-text-stroke: 5px var(--st-paper); text-shadow: 0 0 3px var(--st-paper), 0 0 8px var(--st-paper); }
+.st-reveal { margin-top: 6px; font-size: 1rem; line-height: 1.7; }
+.st-answer-line { margin: 0 0 6px; font-size: 1.056rem; }
+.st-answer-line .st-k { display: inline-block; margin-right: 10px; font-family: var(--font-mono); font-size: .833rem; font-weight: 700; letter-spacing: .14em; color: var(--ink-3); vertical-align: 1px; }
+.st-answer-line.st-yours { color: var(--ink-2); font-size: 1rem; margin-bottom: 14px; }
+.st-reveal-body { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); }
+.st-more, .st-question { margin-top: 14px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+.st-more > summary, .st-question > summary { position: relative; display: flex; align-items: center; min-height: 48px; padding: 4px 40px 4px 14px; font-size: .944rem; font-weight: 700; }
+.st-more > summary::after, .st-question > summary::after { content: ""; position: absolute; right: 10px; top: 50%; width: 20px; height: 20px; margin-top: -10px; background: var(--ink-3); -webkit-mask: var(--m-chevron) center / contain no-repeat; mask: var(--m-chevron) center / contain no-repeat; transition: transform .15s ease; }
+.st-more[open] > summary::after, .st-question[open] > summary::after { transform: rotate(180deg); }
+.st-more[data-anim="close"] > summary::after, .st-question[data-anim="close"] > summary::after { transform: none; }
+.st-more-body, .st-question-body { padding: 4px 14px 12px; border-top: 1px solid var(--line-soft); }
+.st-question-body .st-stage { padding-top: 12px; }
+.st-preview-reveal { padding: 4px 14px 12px; border-top: 1px solid var(--line-soft); }
+.st-preview-skip { display: block; margin-top: 10px; font-size: .833rem; }
+.st-card-preview { pointer-events: none; }
+/* iPhone 上，沒有 cursor: pointer 的元素點了不會產生 click；連點才叫得出面板。也不要讓連點變成放大或選字 */
+dl.version dt:first-of-type { cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none; padding: 8px 0; margin: -8px 0; }
+
+/* ---------- 旅人面板 ---------- */
+.st-adm-day .card-h .muted { margin-left: auto; font-size: .833rem; letter-spacing: 0; text-transform: none; }
+.st-adm-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.st-adm-variants > .btn { flex: 1 1 0; min-width: 0; flex-direction: column; gap: 2px; padding: 6px 10px; }
+.st-adm-variants > .btn > small { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.st-adm-flag { display: flex; align-items: center; gap: 10px; min-height: 44px; margin-top: 4px; font-size: .944rem; }
+.st-adm-flags { margin-top: 6px; }
+.st-adm-flags > .muted { display: block; margin-top: 4px; }
+
+/* ---------- 測試面板（只在 localhost） ---------- */
+/* 放右下、半透明：不要壓到任務頁左下的「看提示」鈕和 footNote */
+.st-test-btn { position: fixed; right: 8px; bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px) + 64px); z-index: 70; width: 34px; height: 34px; opacity: .72; border: 1px solid var(--line); border-radius: 50%; background: var(--warn-soft); color: var(--warn); font-size: .833rem; font-weight: 800; box-shadow: var(--shadow); }
+.st-test-panel { position: fixed; left: 8px; right: 8px; bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px) + 56px); z-index: 70; max-height: 60vh; overflow: auto; padding: 10px 12px 12px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow); font-size: .833rem; }
+.st-t-head { display: flex; align-items: center; gap: 8px; }
+.st-t-head > .st-t-clock { flex: 1 1 auto; color: var(--ink-2); }
+.st-t-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 8px; }
+.st-t-row > .btn { min-height: 36px; padding: 0 10px; font-size: .778rem; }
+.st-t-row > .btn[aria-pressed="true"] { border-color: var(--accent-fill); box-shadow: inset 0 -3px 0 var(--accent-fill); }
+.st-t-input { flex: 1 1 160px; min-height: 36px; padding: 0 8px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); color: var(--ink); font-size: .833rem; }
+.st-t-selftest { overflow-wrap: anywhere; }
+
+@media (prefers-reduced-motion: reduce) { .st-slot.open .st-empty::after { animation: none; opacity: .4; } }
