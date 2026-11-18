@@ -3,7 +3,7 @@
  * 照片快取 fj-photos 由頁面自己管理（解鎖後下載、解密），改版時不刪。
  */
 'use strict';
-const VERSION = '2026-11-09.4';
+const VERSION = '2026-11-18.1';
 const CACHE = 'fj-' + VERSION;
 const PHOTO_CACHE = 'fj-photos';
 // 一定要有的檔案（抓不到就不安裝）

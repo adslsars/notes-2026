@@ -7,7 +7,7 @@
   'use strict';
 
   // ───────────────────────── 常數 ─────────────────────────
-  const APP_VERSION = '2026-11-09.4';
+  const APP_VERSION = '2026-11-18.1';
   const CACHE_NAME = 'fj-' + APP_VERSION;           // 必須與 sw.js 的 CACHE 相同
   const PHOTO_CACHE = 'fj-photos';                  // 照片密文的快取，改版不刪
   const SALT_B64 = 'qEM+Nnu2l1V8dK89NBB7VA==';       // 必須與 tools/encrypt.html 相同
@@ -232,6 +232,16 @@
   }
   const P = (id) => (data && data.places[id]) || { name: id, kind: 'spot', city: '', query: id, mode: 'transit', inTrip: [] };
   const kindLabel = (p) => KIND_LABEL[p.kind] || '地點';
+  // 2026-11-11：當日攻略（data.plans；內容在加密資料裡，例如 12/11 吉卜力）
+  function planOf(r) { return r && r.plan && data && data.plans ? data.plans[r.plan] || null : null; }
+  function planSheetHtml(id) {
+    const p = (data.plans || {})[id] || { title: '', html: '', place: '' };
+    const pl = p.place && data.places[p.place] ? P(p.place) : null;
+    return `<header class="sheet-bar"><button class="sheet-back" type="button">‹ 返回</button><span class="sheet-bar-title">${esc(p.title)}</span></header>` +
+      `<div class="sheet-scroll plan-sheet"><h2 class="sheet-title">${esc(p.title)}</h2>` +
+      (pl ? `<p class="plan-place"><button class="btn ghost" type="button" data-place="${esc(p.place)}">${esc(shortName(pl))}的介紹、地圖 ›</button></p>` : '') +
+      `<div class="plan-body">${p.html}</div></div>`;
+  }
   function shortName(p) {
     let s = String(p.short || p.name).replace(/（[^）]*）/g, '').replace(/\s*[·]\s*.*$/, '').trim();
     if (s.length > 12) s = s.slice(0, 12) + '…';
@@ -272,11 +282,11 @@
 
   // ───────────────────────── 時間軸 ─────────────────────────
   function stepHtml(r, state, idx) {
-    const ids = r.places || [], openable = ids.length > 0;
+    const ids = r.places || [], plan = planOf(r), openable = ids.length > 0 || !!plan;
     const cur = state === 'current';
-    const names = ids.map((id) => P(id).name);
+    const names = plan ? [plan.title] : ids.map((id) => P(id).name);
     const tags = tagsHtml(r.flags);
-    return `<li class="step" data-state="${state}" data-row="${idx}"${openable ? ` data-places="${esc(ids.join(' '))}"` : ''}${r.move ? ` data-move="${r.vehicle || 'train'}"` : ''}${r.flags && r.flags.length ? ` data-flags="${r.flags.join(' ')}"` : ''}${cur ? ' aria-current="step"' : ''}>` +
+    return `<li class="step" data-state="${state}" data-row="${idx}"${openable ? ` data-places="${esc(ids.join(' '))}"` : ''}${plan ? ` data-plan="${esc(r.plan)}"` : ''}${r.move ? ` data-move="${r.vehicle || 'train'}"` : ''}${r.flags && r.flags.length ? ` data-flags="${r.flags.join(' ')}"` : ''}${cur ? ' aria-current="step"' : ''}>` +
       (openable ? `<button class="step-open" type="button" aria-label="${esc(r.tLabel)} ${esc(names.join('、'))}"></button>` : '') +
       `<span class="step-time mono">${esc(r.tLabel)}</span>` +
       `<div class="step-body">${r.move ? (r.vehicle === 'ship' ? ICON.ship : ICON.train) : ''}<div class="step-text">${telify(r.html)}</div>${r.fare ? `<div class="step-fare mono">${esc(r.fare)}</div>` : ''}${tags ? `<div class="step-tags">${tags}</div>` : ''}</div>` +
@@ -661,13 +671,13 @@
     let html = `<section class="now-hero"><div class="now-sleep">${day.sleep.html}</div>${tags ? `<div class="hero-tags">${tags}</div>` : ''}</section>`;
     if (window.FJStamps) html += FJStamps.nowCardHtml();   // stamps.js 掛鉤 8：當日任務卡
     const curIds = cur ? (cur.places || []) : [];
-    html += `<section class="now-current" aria-label="目前這一步"${curIds.length ? ` data-places="${esc(curIds.join(' '))}"` : ''}>${cardOpenHtml(curIds, '目前這一步的地點介紹')}<div class="step-label">現在 <span class="since">${cur ? sinceText(cur, now) : ''}</span></div>${cur ? stepRowHtml(cur) : '<div class="step-text muted">今天還沒開始</div>'}</section>`;
+    html += `<section class="now-current" aria-label="目前這一步"${curIds.length ? ` data-places="${esc(curIds.join(' '))}"` : ''}${planOf(cur) ? ` data-plan="${esc(cur.plan)}"` : ''}>${cardOpenHtml(curIds, '目前這一步的地點介紹')}<div class="step-label">現在 <span class="since">${cur ? sinceText(cur, now) : ''}</span></div>${cur ? stepRowHtml(cur) : '<div class="step-text muted">今天還沒開始</div>'}</section>`;
     if (night && tm) html += tomorrowHtml(tm, day, now, true);
     else if (next) {
       const ids = next.places || [];
       const goP = ids.length ? P(ids[ids.length - 1]) : null;
       const gm = goP ? goMode(next, goP) : null;
-      html += `<section class="now-next" aria-label="下一步"${ids.length ? ` data-places="${esc(ids.join(' '))}"` : ''}>${cardOpenHtml(ids, '下一步的地點介紹')}<div class="step-label">下一步${now.sim ? '<span class="cd-sim">（模擬）</span>' : ''}</div>${countdown(next, now)}${stepRowHtml(next)}` +
+      html += `<section class="now-next" aria-label="下一步"${ids.length ? ` data-places="${esc(ids.join(' '))}"` : ''}${planOf(next) ? ` data-plan="${esc(next.plan)}"` : ''}>${cardOpenHtml(ids, '下一步的地點介紹')}<div class="step-label">下一步${now.sim ? '<span class="cd-sim">（模擬）</span>' : ''}</div>${countdown(next, now)}${stepRowHtml(next)}` +
         (goP ? `<a class="btn primary go-btn" href="${mapDir(goP.query, gm)}" target="_blank" rel="noopener">${ICON.route}怎麼去 ›<small>${esc(shortName(goP))}${gm === 'walking' ? '（走路）' : '（大眾運輸）'}</small></a>` : '') + '</section>';
     } else html += `<section class="now-next done" aria-label="下一步"><div class="step-label">下一步</div><div class="step-text muted">今天的行程走完了${tm ? `。明天 ${esc(tm.rows[0].tLabel)} ${esc(stripTags(tm.rows[0].html))}` : ''}</div></section>`;
     const p = day.rows.length ? (st.cur + 1) / day.rows.length : 0;
@@ -845,8 +855,8 @@
     el.getAnimations().forEach((a) => a.cancel());        // 滑出到一半又打開：取消滑出
     if (window.FJStamps) FJStamps.sheetUnmounted();        // stamps.js 掛鉤 10：換頁時先收掉元件
     const isStamp = top.type === 'stamp' && window.FJStamps;
-    el.innerHTML = isStamp ? FJStamps.sheetHtml(top) : top.type === 'todo' ? todoSheetHtml() : placeSheetHtml(top.id);
-    el.setAttribute('aria-label', isStamp ? (FJStamps.tabLabel() || '任務') : top.type === 'todo' ? '待辦' : '介紹');   // 2 號 v2 #10
+    el.innerHTML = isStamp ? FJStamps.sheetHtml(top) : top.type === 'todo' ? todoSheetHtml() : top.type === 'plan' ? planSheetHtml(top.id) : placeSheetHtml(top.id);
+    el.setAttribute('aria-label', isStamp ? (FJStamps.tabLabel() || '任務') : top.type === 'todo' ? '待辦' : top.type === 'plan' ? '攻略' : '介紹');   // 2 號 v2 #10
     el.hidden = false; el.classList.add('open');
     if (isStamp) FJStamps.sheetMounted(el, top);
     const sc = $('.sheet-scroll', el); if (sc) sc.scrollTop = 0;
@@ -1209,6 +1219,22 @@
   }
   function bindEvents() {
     $$('.tabbar .tab').forEach((t) => { t.addEventListener('click', () => setTab(t.dataset.tab)); });
+    document.addEventListener('click', (e) => {
+      const z = e.target.closest && e.target.closest('[data-plan-zoom]');
+      if (z) {
+        const f = z.parentElement && z.parentElement.nextElementSibling;
+        if (f && f.matches('figure')) { const on = f.classList.toggle('p-zoomed'); z.textContent = on ? '縮小地圖' : '放大地圖'; }
+        return;
+      }
+      const j = e.target.closest && e.target.closest('[data-plan-jump]');
+      if (!j) return;
+      e.preventDefault();
+      const tgt = document.getElementById('plan-' + j.dataset.planJump) || document.getElementById(j.dataset.planJump);
+      if (!tgt) return;
+      const d = tgt.closest('details');
+      if (d && !detailsIsOpen(d)) animateDetails(d, true);
+      tgt.scrollIntoView({ block: 'start', behavior: REDUCE() ? 'auto' : 'smooth' });
+    });
     // 旅人 10/7：<details> 要滑出來 → 攔截 summary 的點擊，自己開關＋播動畫（summary 裡的連結、按鈕照常）；資訊頁五顆鈕用捲動、不改網址
     document.addEventListener('click', (e) => {
       const s = e.target.closest('summary');
@@ -1237,6 +1263,8 @@
       if (t.matches('a[href^="https://www.google.com/maps"]')) { if (!navigator.onLine) toast('需要網路才能開地圖'); return; }
       if (t.matches('.sheet-back')) { sheetBack(); return; }
       if (t.matches('.step-open') || t.matches('.card-open')) {
+        const pb = t.closest('[data-plan]');   // 2026-11-11：有當日攻略的列（12/11 吉卜力）點開是攻略
+        if (pb && data.plans && data.plans[pb.dataset.plan]) { openSheet({ type: 'plan', id: pb.dataset.plan }, t); return; }
         const box = t.closest('[data-places]'); if (!box) return;
         pickOrOpen(box, box.dataset.places.split(' ').filter(Boolean), t); return;
       }

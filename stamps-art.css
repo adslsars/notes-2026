@@ -28,6 +28,7 @@
 .st-lab.st-bold { font-weight: 800; }
 .st-lab.st-dim { opacity: .7; }
 .st-lab.st-small { font-weight: 500; }
+.st-lab.st-mincho { font-family: var(--st-mincho); font-weight: 500; letter-spacing: 0; }
 .st-rect { position: absolute; z-index: 1; background: var(--st-flash); mix-blend-mode: var(--st-flash-blend); opacity: 0; transition: opacity .12s ease; pointer-events: none; border-radius: 2px; }
 .st-rect.st-on { opacity: 1; }
 .st-zone-on { position: absolute; inset: 0; pointer-events: none; }
